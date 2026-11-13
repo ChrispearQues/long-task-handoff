@@ -1,0 +1,19 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Byte-compile
+        run: python -m py_compile scripts/*.py
+      - name: Queue smoke test
+        run: |
+          export JOBQ_STATE=/tmp/jobq.json JOBQ_ROOT=/tmp/jobs
+          python scripts/jobq.py submit --title t --task "write 42" --out /tmp/t1
+          python scripts/jobq.py next --worker ci | grep -q "^JOB "
+          python scripts/jobq.py next --worker ci | grep -q NO_JOB
+          python scripts/jobq.py list --all
