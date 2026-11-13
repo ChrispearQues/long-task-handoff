@@ -30,3 +30,11 @@ Notes:
 - `timeoutSeconds` is the hard ceiling for one job. Keep it below whatever the scheduler tolerates, and keep `MAXMIN` in the task card lower still so the worker yields partial results instead of being killed.
 - `failureAlert` matters: without it, a worker that fails every tick looks exactly like a worker with nothing to do.
 - After the first day, check `lastDelivered` on the job. A worker can run `ok` and still have its message dropped.
+## The narration trap (cost a full rebuild to find)
+
+In an isolated cron run, **every assistant message is delivered to the user**, not just the final one. A model that opens with "I'll check the job queue." sends that line to the user's phone as if it were the answer. Instruction wording matters:
+
+- Weak: "do not narrate" - the model still narrates.
+- Working: "Your session is isolated and **every sentence you emit is pushed to the user's phone**. You may not emit a single character before your first tool call."
+
+Verify by reading the run transcript: the first assistant entry must be empty (tool call), and the last must be the one-liner or the silent token.
