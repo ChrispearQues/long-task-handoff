@@ -60,7 +60,7 @@ python3 scripts/video_job.py start --name ep12 -- ffmpeg -y -i in.mp4 -c:v libx2
 python3 scripts/video_job.py list
 ```
 
-## Four facts this skill is built on
+## Five facts this skill is built on
 
 Each one came from a production failure, not from documentation:
 
@@ -68,6 +68,7 @@ Each one came from a production failure, not from documentation:
 2. **Isolated sessions deliver proactively** and are not bound by that window. This is why the worker can run for fifteen minutes and still report back.
 3. **One failing tool call suppresses the whole reply.** A bare `mkdir` on an existing directory marked a completed job as failed, and the completion message was dropped. Every command in a worker must be failure-tolerant.
 4. **Proactive delivery cannot attach files.** Announcements carry text only. Attachments must be sent by the channel-facing session in a normal reply.
+5. **Worker narration reaches the user.** A background worker that says "I'll start by checking the job queue" gets that line delivered to the chat as if it were an answer. Workers must stay silent until they have a result.
 
 ## Design notes
 

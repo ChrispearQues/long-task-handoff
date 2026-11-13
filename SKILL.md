@@ -91,7 +91,8 @@ jobq.py list --all
 2. **Every shell command in a worker ends with `|| true`**, and directories are created with `mkdir -p`. A stray non-zero exit silently kills the announcement.
 3. **The completion announcement carries text only.** Proactive delivery cannot attach files. Attachments must be sent by the channel-facing session in a normal reply.
 4. **One attachment per message.** Multiple multi-megabyte files in one message get dropped silently.
-5. **Do not start two renders of the same source.** Check `list` first; on small machines they starve each other.
+5. **No narration in a worker.** Every sentence a worker emits can reach the user's chat. Do not print progress lines such as "I'll start by checking the job queue"; emit either the final one-liner or the silent token.
+6. **Do not start two renders of the same source.** Check `list` first; on small machines they starve each other.
 6. **Report the job id and expected duration** the moment you submit, so the user knows the turn is not stuck.
 
 ## Pitfalls (all observed in production)
@@ -101,6 +102,8 @@ jobq.py list --all
 - **Restarting the render instead of checking status.** On an 8 GB machine two concurrent 1080p multiplane renders fought for CPU and were OOM-killed (`rc -9`) twice.
 - **Assuming the announcement arrived because the tool returned success.** Verify with the channel's own delivery log where available.
 - **Jobs left in `running` after a crash.** Run `reap` at the start of every worker tick.
+- **Narration leaked into the chat.** A worker that opened with "I'll start by checking the job queue" had that line delivered to the user as a standalone message. Ban narration explicitly; models do it by default.
+- **A silent success looks broken.** A worker that never says anything when idle is fine, but a worker that fails silently is not. Use `failureAlert` and check `lastDelivered`.
 
 ## Non-goals
 
