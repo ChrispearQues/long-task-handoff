@@ -93,7 +93,7 @@ jobq.py list --all
 4. **One attachment per message.** Multiple multi-megabyte files in one message get dropped silently.
 5. **No narration in a worker.** Every sentence a worker emits can reach the user's chat. Do not print progress lines such as "I'll start by checking the job queue"; emit either the final one-liner or the silent token.
 6. **Do not start two renders of the same source.** Check `list` first; on small machines they starve each other.
-6. **Report the job id and expected duration** the moment you submit, so the user knows the turn is not stuck.
+7. **Report the job id and expected duration** the moment you submit, so the user knows the turn is not stuck.
 
 ## Pitfalls (all observed in production)
 
